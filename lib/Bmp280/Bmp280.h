@@ -1,7 +1,7 @@
 #ifndef Bmp280_h
 #define Bmp280_h
-#include "Arduino.h"
-#include "Adafruit_BMP280.h"
+#include <Arduino.h>
+#include <Adafruit_BMP280.h>
 #include <BarometerInterface.h>
 #include <Wire.h>
 #include <Log.h>

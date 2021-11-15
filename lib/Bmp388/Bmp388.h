@@ -1,7 +1,7 @@
 #ifndef Bmp388_h
 #define Bmp388_h
-#include "Arduino.h"
-#include "Adafruit_BMP3XX.h"
+#include <Arduino.h>
+#include <Adafruit_BMP3XX.h>
 #include <BarometerInterface.h>
 #include <Wire.h>
 #include <Log.h>
