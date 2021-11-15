@@ -2,8 +2,8 @@
 #define Constants_h
 
 // Configuration 
-#define BAUDRATE									115200
-#define DEVELOPMENT									TRUE
+#define BAUDRATE            115200
+#define DEVELOPMENT         TRUE
 
 // State Machine
 enum StateMachine {
@@ -19,10 +19,10 @@ enum StateMachine {
 };
 
 // I2C
-#define INA219_ADDR                 				0x40
-#define MPU9250_ADDR                				0x68
-#define BMP280_ADDR                 				0x76
-#define BMP388_ADDR                 				0x77
+#define INA219_ADDR         0x40
+#define MPU9250_ADDR        0x68
+#define BMP280_ADDR         0x76
+#define BMP388_ADDR         0x77
 
 const int I2C_ADDRESSES[4] = {
     INA219_ADDR,
@@ -42,7 +42,7 @@ const int I2C_ADDRESSES[4] = {
 #define CRITICAL_POWER                         		20000
 
 // BMP388
-#define BMP388_INTERVAL               				5000 //ms
+#define BMP388_INTERVAL               				5000
 #define SEA_LEVEL_PRESSURE_HPA        				1010
 #define BMP388_TEMP_OVERSAMP          				BMP3_OVERSAMPLING_8X  
 #define BMP388_PRES_OVERSAMP          				BMP3_OVERSAMPLING_4X  
