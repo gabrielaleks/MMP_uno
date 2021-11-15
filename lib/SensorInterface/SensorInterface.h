@@ -1,11 +1,11 @@
-#ifndef Sensor_h
-#define Sensor_h
+#ifndef SensorInterface_h
+#define SensorInterface_h
 #include <Arduino.h>
 #include <Wire.h>
 #include <sdios.h>
 #include <Constants.h>
 
-class Sensor {
+class SensorInterface {
     public:
         virtual bool init();
         // void printSys(String, String);
