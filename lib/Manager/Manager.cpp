@@ -1,75 +1,89 @@
 #include <Manager.h>
 
+unsigned long Manager::currentTime;
+
+StateMachine state;
+
 int Manager::addressesFound[] = {0};
 
-bool Manager::init() {
-    Serial.println("\n--- INITIALIZING ---");
-    // Inicializar i2c
-    initI2c();
-    // Inicializar interface
-    // led.setLedPin(10);
-
-    // Inicializar ina219
-    ina219.init();
-
-    // Inicializar bmp388
-    bmp388.init();
-    bmp388.setSampling();
-    Serial.println("--- DONE ---\n");
+void Manager::startStateMachine() {
+    Log::println("Setting state machine to state COLD_START");
+    state = StateMachine::COLD_START;
 }
 
-bool Manager::systemTest() {
-    Serial.println("--- RUNNING WHOLE SYSTEM TEST --- ");
-    Serial.println("# INA219 TEST #");
-    ina219.printValues();
-    Serial.println("# BMP388 TEST #");
-    bmp388.updateValues();
-    bmp388.printValues();
+int Manager::getState() {
+    return state;
+}
 
-    Serial.println("--- DONE ---");
+void Manager::setState(StateMachine st) {
+    state = st;
+}
+
+void Manager::startSerial() {
+    Serial.begin(BAUDRATE);
+    
+	while (!Serial) {
+        delay(1);
+    }
+}
+
+bool Manager::init() {
+    Log::println("Initializing devices");
+    if (
+        initI2c() &&
+        ina219.init() &&
+        bmp388.init()
+        ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void Manager::systemTest() {
+    Log::println("\n--- RUNNING WHOLE SYSTEM TEST --- ");
+    Log::println("# INA219 TEST #");
+    ina219.update();
+    ina219.printValues();
+    Log::space();
+    Log::println("# BMP388 TEST #");
+    bmp388.update();
+    bmp388.printValues();
+    Log::println("--- DONE ---\n");
 }
 
 bool Manager::initI2c() {
     Wire.begin();
-    // Serial.println("\nVERIFYING I2C BUS");
-    UserInterface::printSysln("I2C", "Verifying I2C bus");
+    
+    Log::printSysln("I2C", "Verifying I2C bus");
     detectI2c();
-    checkI2cDevices();
-    // Serial.println("DONE");
-    UserInterface::printSysln("I2C", "Done");
+    
+    if (checkI2cBus()) {
+        Log::printSysln("I2C", "Done");
+        return true;
+    } else {
+        Log::printErrln("I2C", "Error detected in I2C");
+        return false;
+    }
 }
 
-bool Manager::checkI2cDevices() {    
+bool Manager::checkI2cBus() {    
     int errorCounter = 0;
-    for (unsigned int i = 0; i < sizeof(I2CADDRESSES)/sizeof(I2CADDRESSES[0]); i++) {
-        // Serial.println(I2CADDRESSES[i], HEX);
-        // Serial.println(addressesFound[i], HEX);
-        // if (I2CADDRESSES[i] != addressesFound[i] && addressesFound[i] != 0) {
-        //     UserInterface::printErr("I2C", "Device incorrectly connected to address 0X");
-        //     Serial.print(addressesFound[i], HEX);
-        //     Serial.print("; should be connected to 0X");
-        //     Serial.println(I2CADDRESSES[i], HEX);
-        //     errorCounter++;
-        // } else if (I2CADDRESSES[i] != addressesFound[i] && addressesFound[i] == 0) {
-        //     UserInterface::printErr("I2C", "Missing device; should be connected to 0X");
-        //     Serial.println(I2CADDRESSES[i], HEX);
-        //     errorCounter++;
-        // }
-        if (I2CADDRESSES[i] != addressesFound[i]) {
-            UserInterface::printErr("I2C", "Device wrongly connected/missing | ");
+    for (unsigned int i = 0; i < sizeof(I2C_ADDRESSES)/sizeof(I2C_ADDRESSES[0]); i++) {
+        if (I2C_ADDRESSES[i] != addressesFound[i]) {
+            Log::printErr("I2C", "Device wrongly connected/missing | ");
             Serial.print("Found 0x");
             Serial.print(addressesFound[i], HEX);
             Serial.print("; expected 0x");
-            Serial.println(I2CADDRESSES[i], HEX);
+            Serial.println(I2C_ADDRESSES[i], HEX);
             errorCounter++;
         }
     }
     if (errorCounter == 0) {
-        // Serial.println("No problems found");
-        UserInterface::printSysln("I2C", "No problems found");
-        return 1;
+        Log::printSysln("I2C", "No problems found");
+        return true;
     } else { 
-        return 0;
+        return false;
     }
 }
 
@@ -77,7 +91,7 @@ void Manager::detectI2c() {
     byte error, address;
     int nDevices;
 
-    UserInterface::printSysln("I2C", "Searching for devices...");
+    Log::printSysln("I2C", "Searching for devices...");
 
     nDevices = 0;
     for (address = 1; address < 127; address++) {
@@ -86,27 +100,69 @@ void Manager::detectI2c() {
 
 
         if (error == 0) {
-            // Serial.print("I2C device found at address 0x");
-            UserInterface::printSys("I2C", "Device found at address 0x");
+            Log::printSys("I2C", "Device found at address 0x");
             if (address < 16)
                 Serial.print("0");
             Serial.println(address, HEX);
             addressesFound[nDevices] = address;
             nDevices++;
         } else if (error == 4) {
-            // Serial.print("Unknown error at address 0x");
-            UserInterface::printSys("I2C", "Unknown error at address 0x");
+            Log::printSys("I2C", "Unknown error at address 0x");
             if (address < 16)
                 Serial.print("0");
             Serial.println(address, HEX);
         }
     }
     if (nDevices == 0) {
-        // Serial.println("No I2C devices found");
-        UserInterface::printSysln("I2C", "No I2C devices found");
+        Log::printSysln("I2C", "No I2C devices found");
     }
     else {
-        // Serial.println("Ended search");
-        UserInterface::printSysln("I2C", "Ended search");
+        Log::printSysln("I2C", "Ended search");
+    }
+}
+
+void Manager::startCountingTime() {
+    currentTime = millis();
+}
+
+unsigned long Manager::getCurrentTime() {
+    return currentTime;
+}
+
+void Manager::readSensors() {
+    handleIna219();
+    handleBmp388();
+}
+
+void Manager::handleIna219() {
+    if (Manager::getCurrentTime() - ina219.previousTime >= INA_INTERVAL) {
+        ina219.update();
+
+        if (DEVELOPMENT) {
+            Serial.println(Manager::getCurrentTime());
+            ina219.printValues();
+            if (ina219.isCharging()) {
+                Log::printWarln("INA219", "Battery being charged");
+            }
+            Log::space();
+        }
+
+        ina219.validate();
+        ina219.previousTime = currentTime;
+    }
+
+}
+
+void Manager::handleBmp388() {
+    if (Manager::getCurrentTime() - bmp388.previousTime >= BMP388_INTERVAL) {
+        bmp388.update();
+
+        if (DEVELOPMENT) {
+            Serial.println(Manager::getCurrentTime());
+            bmp388.printValues();
+            Log::space();
+        }
+
+        bmp388.previousTime = currentTime;
     }
 }
