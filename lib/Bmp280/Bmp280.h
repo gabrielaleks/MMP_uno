@@ -1,19 +1,19 @@
-#ifndef Bmp388_h
-#define Bmp388_h
+#ifndef Bmp280_h
+#define Bmp280_h
 #include "Arduino.h"
-#include "Adafruit_BMP3XX.h"
+#include "Adafruit_BMP280.h"
 #include <BarometerInterface.h>
 #include <Wire.h>
 #include <Log.h>
 
-class Bmp388: public BarometerInterface, Adafruit_BMP3XX {
+class Bmp280: public BarometerInterface, Adafruit_BMP280 {
 private:
     struct data {
         double m_temperature;
         double m_pressure;
         double m_altitude;
     };
-    data Bmp388;
+    data Bmp280;
     void setSampling();
 public:
     unsigned long previousTime = 0;
@@ -24,6 +24,7 @@ public:
     double getAltitude();
     void printValues();
     void mockData(float tmp, float prs, float alt);
+    void reset();
 };
 
 #endif

@@ -3,64 +3,55 @@
 
 bool Bmp388::init() {
     if (!begin_I2C(BMP388_ADDR)) {
-        // Serial.println("BMP388: Failed to initialize");
-        UserInterface::printSysln("BMP388", "Failed to initialize");
-        setIsWorking(false);
+        Log::printErrln("BMP388", "Failed to initialize");
+        return false;
     } else {
-        // Serial.println("BMP388: Success");
-        UserInterface::printSysln("BMP388", "Success");
-        setIsWorking(true);
+        Log::printSysln("BMP388", "Success");
+        setSampling();
+        return true;
     }
-}
-
-void Bmp388::setIsWorking(bool status) {
-    isWorking = status;
-}
-
-bool Bmp388::getIsWorking() {
-    return isWorking;
 }
 
 void Bmp388::setSampling() {
-    setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
-    setPressureOversampling(BMP3_OVERSAMPLING_4X);
-    setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-    setOutputDataRate(BMP3_ODR_50_HZ);
+    setTemperatureOversampling(BMP388_TEMP_OVERSAMP);
+    setPressureOversampling(BMP388_PRES_OVERSAMP);
+    setIIRFilterCoeff(BMP388_FILTERING);
+    setOutputDataRate(BMP388_DATARATE);
 }
 
-void Bmp388::updateValues() {
+bool Bmp388::update() {
     if (!performReading()) {
-        // Serial.println("BMP388: Failed to perform reading");
-        UserInterface::printSysln("BMP388", "Failed to perform reading");
-        return;
+        Log::printSysln("BMP388", "Failed to perform reading");
+        return false;
     }
+
+    Bmp388.m_temperature = temperature;
+    Bmp388.m_pressure = pressure/100;
+    Bmp388.m_altitude = readAltitude(SEA_LEVEL_PRESSURE_HPA); 
+    
+    return true;
 }
 
 double Bmp388::getTemperature() {
-    // Serial.print("Temperature: ");
-    // Serial.println(temperature);
-    return temperature;
+    return Bmp388.m_temperature;
 }
 
 double Bmp388::getPressure() {
-    // Serial.print("Pressure: ");
-    // Serial.println(pressure/100);
-    return pressure/100;
+    return Bmp388.m_pressure;
 }
 
 double Bmp388::getAltitude() {
-    // Serial.print("Altitude: ");
-    // Serial.println(readAltitude(SEALEVELPRESSURE_HPA));
-    return readAltitude(SEALEVELPRESSURE_HPA);
+    return Bmp388.m_altitude;
 }
 
 void Bmp388::printValues() {
-//     cout << "Temperature   " << getBusVoltage() << " V" << endl;
-//     cout << "Pressure: " << getShuntVoltage() << " mV" << endl;
-//     cout << "Altitude:  " << getLoadVoltage() << " V" << endl;
-//     cout << "" << endl;
     Serial.println("Temperature: " + String(getTemperature()) + " C");
     Serial.println("Pressure: " + String(getPressure()) + " hPa");
     Serial.println("Altitude: " + String(getAltitude()) + " m");
-    Serial.println();
+}
+
+void Bmp388::mockData(float tmp, float prs, float alt) {
+    Bmp388.m_temperature = tmp;
+    Bmp388.m_pressure = prs;
+    Bmp388.m_altitude = alt;
 }
