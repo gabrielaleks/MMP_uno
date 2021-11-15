@@ -2,7 +2,7 @@
 #define Constants_h
 
 // Configuration 
-#define BAUDRATE									9600
+#define BAUDRATE									115200
 #define DEVELOPMENT									TRUE
 
 // State Machine
