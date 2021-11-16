@@ -56,6 +56,9 @@ const int I2C_ADDRESSES[4] = {
 #define BMP280_FILTERING              				Adafruit_BMP280::FILTER_X16
 #define BMP280_STANDBY                				Adafruit_BMP280::STANDBY_MS_500
 
+// MPU9250
+#define MPU9250_INTERVAL                            1000
+
 // AdafruitSD
 #define SD_ADAFRUIT_CS                   			8
 #define SD_ADAFRUIT_SPI_FREQ            			20
