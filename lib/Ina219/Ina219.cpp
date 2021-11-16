@@ -135,14 +135,8 @@ bool Ina219::checkIfVoltageIncreased() {
                 && compareToNextReadings(difference, i)) {
                     return true;
                 }
-                // smallerVoltage = lastVoltage[i-1];
-                // if(compareToPreviousReadings(difference, i) && compareToNextReadings(difference, i)) {
-                //     setWasCharging(true);
-                //     return true;  
-                // }
             } 
         }
-    // }
 
     return false;
 }
