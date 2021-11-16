@@ -21,21 +21,21 @@ void Bmp280::setSampling() {
 }
 
 bool Bmp280::update() {
-    Bmp280.m_temperature = readTemperature();
-    Bmp280.m_pressure = readPressure();
-    Bmp280.m_altitude = readAltitude();
+    bmp280.m_temperature = readTemperature();
+    bmp280.m_pressure = readPressure();
+    bmp280.m_altitude = readAltitude();
 }
 
 double Bmp280::getTemperature() {
-    return Bmp280.m_temperature;
+    return bmp280.m_temperature;
 }
 
 double Bmp280::getPressure() {
-    return Bmp280.m_pressure;
+    return bmp280.m_pressure;
 }
 
 double Bmp280::getAltitude() {
-    return Bmp280.m_altitude;
+    return bmp280.m_altitude;
 }
 
 void Bmp280::printValues() {
@@ -45,9 +45,9 @@ void Bmp280::printValues() {
 }
 
 void Bmp280::mockData(float tmp, float prs, float alt) {
-    Bmp280.m_temperature = tmp;
-    Bmp280.m_pressure = prs;
-    Bmp280.m_altitude = alt;
+    bmp280.m_temperature = tmp;
+    bmp280.m_pressure = prs;
+    bmp280.m_altitude = alt;
 }
 
 void Bmp280::reset() {

@@ -25,23 +25,23 @@ bool Bmp388::update() {
         return false;
     }
 
-    Bmp388.m_temperature = temperature;
-    Bmp388.m_pressure = pressure/100;
-    Bmp388.m_altitude = readAltitude(SEA_LEVEL_PRESSURE_HPA); 
+    bmp388.m_temperature = temperature;
+    bmp388.m_pressure = pressure/100;
+    bmp388.m_altitude = readAltitude(SEA_LEVEL_PRESSURE_HPA); 
     
     return true;
 }
 
 double Bmp388::getTemperature() {
-    return Bmp388.m_temperature;
+    return bmp388.m_temperature;
 }
 
 double Bmp388::getPressure() {
-    return Bmp388.m_pressure;
+    return bmp388.m_pressure;
 }
 
 double Bmp388::getAltitude() {
-    return Bmp388.m_altitude;
+    return bmp388.m_altitude;
 }
 
 void Bmp388::printValues() {
@@ -51,7 +51,7 @@ void Bmp388::printValues() {
 }
 
 void Bmp388::mockData(float tmp, float prs, float alt) {
-    Bmp388.m_temperature = tmp;
-    Bmp388.m_pressure = prs;
-    Bmp388.m_altitude = alt;
+    bmp388.m_temperature = tmp;
+    bmp388.m_pressure = prs;
+    bmp388.m_altitude = alt;
 }

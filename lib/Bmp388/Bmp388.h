@@ -13,7 +13,7 @@ private:
         double m_pressure;
         double m_altitude;
     };
-    data Bmp388;
+    data bmp388;
     void setSampling();
 public:
     unsigned long previousTime = 0;
