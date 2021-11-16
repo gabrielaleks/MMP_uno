@@ -32,15 +32,16 @@ bool Manager::init() {
     if (
         initI2c() &&
         ina219.init() &&
-        bmp388.init()
-        ) {
+        bmp388.init() &&
+        mpu9250.init()
+    ) {
         return true;
     } else {
         return false;
     }
 }
 
-void Manager::systemTest() {
+void Manager::sensorsTest() {
     Log::println("\n--- RUNNING WHOLE SYSTEM TEST --- ");
     Log::println("# INA219 TEST #");
     ina219.update();
@@ -49,7 +50,12 @@ void Manager::systemTest() {
     Log::println("# BMP388 TEST #");
     bmp388.update();
     bmp388.printValues();
+    Log::space();
+    Log::println("# MPU9250 TEST #");
+    mpu9250.update();
+    mpu9250.printValues();
     Log::println("--- DONE ---\n");
+    
 }
 
 bool Manager::initI2c() {
@@ -132,13 +138,20 @@ unsigned long Manager::getCurrentTime() {
 void Manager::readSensors() {
     handleIna219();
     handleBmp388();
+    handleMpu9250();
 }
 
 void Manager::handleIna219() {
     if (Manager::getCurrentTime() - ina219.previousTime >= INA_INTERVAL) {
-        ina219.update();
+        // ina219.update();
 
         if (DEVELOPMENT) {
+            ina219.mockData(
+                4000,
+                200,
+                1000
+            );
+            
             Serial.println(Manager::getCurrentTime());
             ina219.printValues();
             if (ina219.isCharging()) {
@@ -155,14 +168,47 @@ void Manager::handleIna219() {
 
 void Manager::handleBmp388() {
     if (Manager::getCurrentTime() - bmp388.previousTime >= BMP388_INTERVAL) {
-        bmp388.update();
+        // bmp388.update();
 
         if (DEVELOPMENT) {
+            bmp388.mockData(
+                40,
+                10100,
+                4
+            );
+
             Serial.println(Manager::getCurrentTime());
             bmp388.printValues();
             Log::space();
         }
 
         bmp388.previousTime = currentTime;
+    }
+}
+
+void Manager::handleMpu9250() {
+    if (Manager::getCurrentTime() - mpu9250.previousTime >= MPU9250_INTERVAL) {
+        // mpu9250.update();
+        
+        if (DEVELOPMENT) {
+            mpu9250.mockData(
+                3,
+                4,
+                2,
+                1,
+                6,
+                5,
+                3,
+                7,
+                8,
+                42
+            );
+
+            Serial.println(Manager::getCurrentTime());
+            mpu9250.printValues();
+            Log::space();
+        }
+
+        mpu9250.previousTime = currentTime;
     }
 }
